@@ -1,0 +1,323 @@
+---
+title: "Ch 21 Notebook"
+output: html_notebook
+---
+
+```{r setup}
+library(tidyverse)
+```
+
+##21.2 Exercises
+
+###Exercise 1
+  
+Write for loops to:
+  
+  1. Compute the mean of every column in "mtcars"
+```{r}
+mtcars %>% map_dbl(mean)
+```
+  
+  2. Determine the type of each column in "nycflights13::flights"
+```{r}
+yo<-nycflights13::flights
+
+output <-vector("list", ncol(yo))
+for (i in seq_along(yo)){
+  output[[i]]<-class(yo[[i]])
+}
+output
+```
+  
+  3. Compute the number of unique values in each column of "iris"
+```{r}
+output<-vector("list", ncol(iris))
+for(i in seq_along(iris)){
+  output[[i]]<-length(unique(iris[[i]]))
+}
+output
+```
+  
+  
+  4. Generate 10 random normals for each of M = -10, 0, 10, and 100
+```{r}
+#WHAT DOES THAT IT EVEN MEAN
+```
+
+###Exercise 2
+
+Eliminate the for loop in each of the following examples by taking advantage of an existing function that works with vectors
+```{r}
+#Uhhhhhh
+```
+
+
+###Exercise 3
+
+Combine your function writing and for loop skills:
+  1. Write a for loop that "prints()" the lyrics to the children's song "Alice the camel"
+```{r}
+humps<-c("five","four","three","two","one","no")
+
+alice<- function(x){
+        cat("Alice the camel has", x ,"humps\nAlice the camel has", x, "humps\nAlice the camel has", x, "humps\nSo go, Alice, go\n\n")
+}
+
+for(i in seq_along(humps)){
+  alice(humps[[i]])
+}
+```
+  
+  2. Convert the nursery ryhme "ten in the bed" to a function. Generalise it to any number of people in any sleeping structure.
+```{r}
+bed<- function(x){
+  cat("There were", x, "in the bed\nAnd the little one said, \"Roll over! Roll over!\"\nSo they all rolled over and one fell out\n\n")
+}
+
+last<-"There was 1 in the bed\nAnd the little one said,\n\"Alone at last!\""
+
+number<-function(x){
+  y=x
+  if(x>1){
+    for(i in 2:x){
+      bed(y)
+      y=y-1
+    } 
+  } 
+  cat(last)
+}
+number(1)
+```
+  
+  
+  3. Convert the song "99 bottes of beer on the wall" to a function. Generalise to any number of any vessel containing any liquid on any surface
+```{r}
+beer<-function(x,y){
+  cat(x, "bottles of", y, "on the wall,", x, "bottles of",str_c( y, ".\nTake one down and pass it around,"), x-1, "bottles of", y, "on the wall\n\n")
+}
+
+yup<-function(x,y){
+  z=x
+  if(z>1){
+    for(i in 2:x){
+      beer(z,y)
+      z=z-1
+    } 
+  }
+  cat("No more bottles of", y, "on the wall, no more bottles of", y,".\nGo to the store and buy some more,",x,"bottles of",y,"on the wall")
+}
+
+yup(4,"milk")
+  
+```
+
+###Exercise 4
+
+It's common to see for loops that don't preallocate the output and instead increase the length of a vector at each step:
+```{r}
+x<-c(1,2,4,8,7,9)
+
+output <- vector("integer", 0)
+for (i in seq_along(x)){
+  output <- c(output, length(x[[i]]))
+}
+  output 
+```
+
+
+##21.3 Exercises
+
+###Exercise 1
+Imagine you have a directory full of CSV files that you want to read in. You have their paths in a vector, "files <- dir("data/", pattern = "\\.csv$", full.names = TRUE)", and now want to read each one with read_csv(). Write the for loop that will load them into a single data frame.
+```{r}
+files <- dir(path="data/", pattern = "\\.csv$", full.names = TRUE)
+
+output<-vector("list", length(files))
+for (i in seq_along(files)){
+  output[[i]]<-read.csv(files[[i]])
+output
+  }
+```
+
+
+###Exercise 2
+What happens if you use "for (nm in names(x))" and x has no names? What if only some of the elements are named? What if the names are not unique?
+
+```{r}
+#No names:
+x<-c(1, 2, 3)
+for(nm in names(x)){
+  print(nm) 
+}
+```
+The environment tells me that nm is NULL! I don't
+know why its showing up in the console, though?
+
+```{r}
+#Some named:
+y<-c(do=1, re=2, mi=3, 4, so=5,la=6, ti=7)
+for(nm in names(y)){
+  print(nm)
+}
+```
+Ahh, the value missing a name is given a placeholder name: ""
+
+```{r}
+#Same name:
+z<-c(do=1, re=2, mi=3, la=4, so=5,la=6, ti=7, do=8)
+for(nm in names(z)){
+  print(nm)
+}
+```
+"do" and "do" are considered different values.
+
+###Exercise 3
+Write a function that prints the mean of each numeric column in a data frame, along with its name. For example, "show_mean(iris)" would print:
+```{r}
+okay<-function(x){
+  for (i in seq_along(x)){
+    if(class(x[[i]])=="numeric"){
+     cat(str_c(colnames(x[i]),":"),mean(x[,i], na.rm=FALSE),"\n") 
+    }
+    else{
+      cat(str_c(colnames(x[i]),": NA"))
+    }
+  }
+}
+okay(iris)
+```
+
+###Exercise 4
+What does this code do? How does it work?
+```{r}
+trans <- list( 
+  disp = function(x) x * 0.0163871,
+  am = function(x) {
+    factor(x, labels = c("auto", "manual"))
+  }
+)
+for (var in names(trans)) {
+  mtcars[[var]] <- trans[[var]](mtcars[[var]])
+}
+```
+
+##21.4 Exercises
+
+###Exercise 1
+Read the documentation for "apply()". In the 2d case, what two for loops does it generalise?
+```{r}
+?apply
+```
+
+
+###Exercise 2
+Adapt "col_summary()" so that it only applies to numeric columns You might want to start with an "is_numeric()" function that returns a logical vector that has a TRUE corresponding to each numeric column.
+```{r}
+col_summary <- function(df, fun) {
+  out <- vector("double", length(df))
+  for (i in seq_along(df)) {
+    if(is.numeric(df[[i]])==TRUE)
+      out[i] <- fun(df[[i]])
+  }
+  out
+}
+
+col_summary(iris, mean)
+```
+
+
+##21.5 Exercises
+
+###Exercise 1
+Write code that uses one of the map functions to:
+  
+  1. Compute the mean of every column in "mtcars"
+```{r}
+mtcars %>% map_dbl(mean)
+```
+  
+  2. Determine the type of each column in "nycflights13::flights"
+```{r}
+nycflights13::flights %>% map(class)
+```
+  
+  3. Compute the number of unique values in each column of "iris"
+```{r}
+iris %>% map_int(~length(unique(.)))
+```
+  
+  4. Generate 10 random normals for each of M = -10, 0, 10, and 100
+```{r}
+#I still don't get this at all :D
+```
+
+###Exercise 2
+How can you create a single vector that for each column in a data frame indicates whether or not it’s a factor?
+```{r}
+(x<-iris %>% map_lgl(~is.factor(.)))
+```
+
+###Exercise 3
+What happens when you use the map functions on vectors that aren’t lists? What does "map(1:5, runif)" do? Why?
+```{r}
+blah<-c(1,2,3,4,5,6)
+map_dbl(blah, ~.*2)
+```
+Hmm, it seems fine? No problems here!
+
+```{r}
+map(1:5, runif)
+
+map(2:5, runif)
+```
+Okay, so Google tells me "runif" is random number generator using Uniform Distribution...something, something...look, that's not important! What is impoprtant is that map(x:y) creates a list of y-x rows. The first row contained x random numbers; the number of random numbers increases by 1 per row until it reaches y random numbers. Err...did you follow all that? 
+
+###Exercise 4
+What does "map(-2:2, rnorm, n = 5)" do? Why? What does "map_dbl(-2:2, rnorm, n = 5)" do? Why?
+```{r}
+map(-2:2, rnorm, n = 5)
+
+map_dbl(-2:2, rnorm, n = 5)
+```
+Okay, so quick Google search tells me rnorm(n, mean, sd) of normally distributed numbers. n is the sample size produced, mean is the sample mean (defaults to 0), and sd is teh sample standard deviation (defaults to 1). In this case, -2:2 represents five rows with means -2,-1,0,1,2, respectively. n=5 is sample size for each row.
+
+map_dbl(-2:2, rnorm, n=5) produces an error. rnorm produces a set of numbers which is definitely NOT a doube vector.
+
+##21.9 Exercises
+
+###Exercise 1
+Implement your own version of "every()" using a for loop. Compare it with "purrr::every()". What does purrr’s version do that your version doesn’t?
+```{r}
+ooh<-c(1,2,3,4,5)
+aah<-c(1,2,"ack",4)
+
+haha<-function(x,y){
+  for(i in seq_along(x)){
+    if(class(x[i]) != y){
+      print(FALSE)
+      break
+    }
+    if(i==length(x-1))
+      print(TRUE)
+  }
+}
+
+haha(ooh, "numeric")
+haha(aah, "numeric")
+```
+
+
+###Exercise 2
+Create an enhanced "col_summary()" that applies a summary function to every numeric column in a data frame.
+```{r}
+col_summary <- function(df) {
+  for (i in seq_along(df)) {
+    if(is.numeric(df[[i]])==TRUE)
+      cat(c(colnames(df[i]),":\n"))
+      print(summary(df[[i]]))
+      cat("\n")
+  }
+}
+
+col_summary(iris)
+```
